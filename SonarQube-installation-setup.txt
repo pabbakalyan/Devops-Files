@@ -2,45 +2,53 @@ installation and configure of SONARQUBE server
 ++++++++++++++++++++++++++++++++++++++
 1. EC2- t2.medium-   ubuntu-22   -connect
 2. update the server
-  #sudo -i
-  #apt-get update -y
+   #sudo -i
+   #apt-get update -y
+
 3. Install java,wget,unzip
- #java --version
- #apt install openjdk-11-jre-headless -y
- #apt install wget -y
- # sudo apt install  unzip -y
-4.now change the dir
+   #java --version
+   #apt install openjdk-11-jre-headless -y
+
+3.1 Install wget and unzip
+   #apt install wget -y
+   # sudo apt install  unzip -y
+
+4. now change the dir
    #cd /opt/
 5.search in browser 
     https://binaries.sonarsource.com/
-	click on Distributions -->sonarqube ----> sonarqube-9.zip  --> copy link address
+    click on Distributions -->sonarqube ----> sonarqube-9.zip  --> copy link address
+
 6. download the sonarqube zip file into server
-  #sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.0.0.45539.zip
+   #sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.0.0.45539.zip
+
 7. unzip sonar
-  # sudo unzip sonarqube-9.0.0.45539.zip
- 8. adduser sonar
-    # sudo adduser sonar
-  give passwrd : sonar
-       retype: sonar
+   # sudo unzip sonarqube-9.0.0.45539.zip
+
+8. adduser sonar
+   # sudo adduser sonar
+   give passwrd : sonar
+   retype: sonar
+
 9. Give normal user acess
-     #visudo
+   #visudo
         root    ALL=(ALL)         ALL= ALL
         sonar ALL=(ALL)        NOPASSWD: ALL
 		for save and quit -->ctrl+x y enter
 
-10.give permission as a normal user
+10. give permission as a normal user
+    # sudo chown -R sonar:sonar /opt/sonarqube-9.0.0.45539/
+    # sudo chmod -R 775 /opt/sonarqube-9.0.0.45539/
 
-           # sudo chown -R sonar:sonar /opt/sonarqube-9.0.0.45539/
-          # sudo chmod -R 775 /opt/sonarqube-9.0.0.45539/
+11. goto inside the sonar dir
+    #cd sonarqube-9.0.0.45539/
+    #cd bin/linux-x86-64/
+    sh sonar.sh start
 
-11.goto inside the sonar dir
-      #cd sonarqube-9.0.0.45539/
-     #cd bin/linux-x86-64/
-	 sh sonar.sh start
- 12. switch to the sonar user
-     # su sonar
+12. switch to the sonar user
+    # su sonar
     $ sh sonar.sh start
-	If it  SonarQube is not running
+    If it  SonarQube is not running
   
 13.Delete the Temp Directory
        $ cd ../../
@@ -85,3 +93,5 @@ goto this dir
       <password>admin1</password>
     </server>
 	++++++++++++++++++++++++++++++++++
+[ or else we can directly ]
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
