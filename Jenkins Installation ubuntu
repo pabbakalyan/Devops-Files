@@ -19,3 +19,7 @@ sudo systemctl status jenkins
 ------------------Official Page-------------------
 
 https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+In oTher way
+jenkins . war file
+wget https://updates.jenkins.io/download/war/2.387.3/jenkins.war
+java -jar jenkins.war --httpPort=8082
