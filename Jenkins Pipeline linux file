@@ -1,3 +1,32 @@
+Installing Plugins in jenkins dashboard
+
+1) SonarQube ScannerVersion 2.15 [ code quality check tool ] its is a server
+2) jdk Eclipse Temurin installerVersion 1.5
+3)DockerVersion 1.4, Docker PipelineVersion 572.v950f58993843, docker-build-stepVersion 2.9, CloudBees Docker Build and PublishVersion 1.4.0
+4)OWASP Dependency-CheckVersion 5.4.0 [ security analysis ]
+
+Tools:
+1) name: jdk
+   install automatically
+   version: jdk-11.0.19+7
+
+2) SonarQube Scanner
+   Name: sonar-scanner
+   install automatically version latest
+
+3) name: maven
+   install automatically
+   version:3.9.4
+ 
+4) Dependency-check
+   name: DP
+   install automatically
+   version: dependency-check 6.5.1
+ 
+5) name:Docker
+   version:Latest
+
+
 pipeline {
     agent any 
     
