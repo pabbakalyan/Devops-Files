@@ -54,6 +54,7 @@ ROOT  docs  examples  host-manager  manager
 root@ip-172-31-52-41:/opt/apache-tomcat-9.0.65/webapps# pwd
 /opt/apache-tomcat-9.0.65/webapps
 
- after this steps
+ after this steps in first server
  cd ..
 cp /home/ubuntu/Petclinic/target/petclinic.war /opt/apache-tomcat-9.0.65/webapps/ 
+then copy ip address and port number 8080 paste in browser then project will be open in server
