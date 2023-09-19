@@ -69,6 +69,15 @@ pipeline {
                 }
             }
         }
+
+       stage("quality gate"){
+            steps {
+                script {
+                  waitForQualityGate abortPipeline: false, credentialsId: 'sonar' 
+                }
+           }
+        }
+
         
         stage("OWASP Dependency Check"){
             steps{
