@@ -8,7 +8,7 @@ Installing Plugins in jenkins dashboard
 Tools:
 1) name: jdk
    install automatically
-   version: jdk-11.0.19+7
+   version: jdk-11.0.19+7 or jdk-17
 
 2) SonarQube Scanner
    Name: sonar-scanner
@@ -16,7 +16,7 @@ Tools:
 
 3) name: maven
    install automatically
-   version:3.9.4
+   version:3.9.4 or 3.6.0
  
 4) Dependency-check
    name: DP
@@ -24,8 +24,11 @@ Tools:
    version: dependency-check 6.5.1
  
 5) name:Docker
-   version:Latest
+  version:Latest
 
+6) config file provider
+
+7) pipeline maven integration
 
 pipeline {
     agent any 
@@ -85,21 +88,35 @@ pipeline {
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
+
+      stage("Trivy FS Scan"){
+            steps{
+                sh "trivy fs ."
+            }
+        }
         
          stage("Build"){
             steps{
                 sh " mvn clean install"
             }
         }
+
+        stage("Deploy to Nexus"){
+            steps{
+                withMaven(globalMavenSettingsConfig: 'global-settings-xml'){
+                sh " mvn delpoy"
+               }
+            }
+        }
         
-        stage("Docker Build & Push"){
+        stage("Docker Build & Tag & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: '58be877c-9294-410e-98ee-6a959d73b352', toolName: 'docker') {
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
                         
                         sh "docker build -t image1 ."
-                        sh "docker tag image1 adijaiswal/pet-clinic123:latest "
-                        sh "docker push adijaiswal/pet-clinic123:latest "
+                        sh "docker tag image1 pabbakalyan/pet-clinic123:latest "
+                        sh "docker push pabbakalyan/pet-clinic123:latest "
                     }
                 }
             }
@@ -107,13 +124,23 @@ pipeline {
         
         stage("TRIVY"){
             steps{
-                sh " trivy image adijaiswal/pet-clinic123:latest"
+                sh " trivy image pabbakalyan/pet-clinic123:latest"
             }
         }
         
         stage("Deploy To Tomcat"){
             steps{
                 sh "cp  /var/lib/jenkins/workspace/CI-CD/target/petclinic.war /opt/apache-tomcat-9.0.65/webapps/ "
+            }
+        }
+
+        stage("Docker Deploy"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker run -itd --name pet -p 8070:8070  pabbakalyan/pet-clinic123:latest "
+                    }
+                }
             }
         }
     }
