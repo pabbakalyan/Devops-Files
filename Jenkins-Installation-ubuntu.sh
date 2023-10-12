@@ -1,3 +1,5 @@
+#!/bin/bash
+
 --- INSTALL JENKINS ---
 
 sudo apt-get update
