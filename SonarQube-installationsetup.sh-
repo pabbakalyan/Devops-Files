@@ -1,3 +1,9 @@
+There are two ways to Setup sonar 
+1) By docker conatiner
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+--------------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------------------------------------------
+2) follow this step to stepup
+
 installation and configure of SONARQUBE server
 ++++++++++++++++++++++++++++++++++++++
 1. EC2- t2.medium-   ubuntu-22   -connect
@@ -92,6 +98,5 @@ goto this dir
       <username>admin</username>
       <password>admin1</password>
     </server>
-	++++++++++++++++++++++++++++++++++
-[ or else we can directly ]
-docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+	
+
