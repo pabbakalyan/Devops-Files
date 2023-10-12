@@ -2,7 +2,7 @@
 Prerequisites:
 wget https://download.sonatype.com/nexus/3/latest-unix.tar.gz
 
-tar -xf latest-unix.tar.gzConfigure Nexus:
+tar -xf latest-unix.tar.gz
 
 cd nexus
 cd bin/
