@@ -1,3 +1,5 @@
+First we need to install Docker and then execute  bellow commands
+
 sudo usermod -aG docker $USER
 docker pull docker.bintray.io/jfrog/artifactory-oss:latest
 sudo mkdir -p /jfrog/artifactory
