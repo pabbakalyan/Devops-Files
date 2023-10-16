@@ -1,0 +1,27 @@
+---
+- name: Install Tomcat Server
+  hosts: all
+  become: true
+  vars:
+    - tomcat_url: https://downloads.apache.org/tomcat/tomcat-9/v9.0.82/bin/apache-tomcat-9.0.82.tar.gz\
+    - tomcat_package: apache-tomcat-10.0.27
+
+  tasks:
+    - name: Install java
+      yum:
+        name: java
+        state: present
+
+    - name: Download Tomcat server packages
+      get_url:
+        url: "{{ tomcat_url }}"
+        dest: /home/ec2-user
+      
+    - name: Extract Tomcat
+      unarchive:
+        src: /home/ec2-user/{{ tomcat_package }}.tar.gz
+        dest: /home/ec2-user
+        remote_src: yes
+    
+    - name: start tomat service
+      shell: nohup /home/ec2-user/{{ tomcat_package }}/bin/startup.sh
