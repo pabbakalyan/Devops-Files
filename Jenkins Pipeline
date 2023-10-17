@@ -4,6 +4,9 @@ Installing Plugins in jenkins dashboard
 2) jdk Eclipse Temurin installerVersion 1.5
 3)DockerVersion 1.4, Docker PipelineVersion 572.v950f58993843, docker-build-stepVersion 2.9, CloudBees Docker Build and PublishVersion 1.4.0
 4)OWASP Dependency-CheckVersion 5.4.0 [ security analysis ]
+5)config file provider
+6)pipeline maven integration
+8)artifactory
 
 Tools:
 1) name: jdk
@@ -29,6 +32,8 @@ Tools:
 6) config file provider
 
 7) pipeline maven integration
+
+8) artifactory
 
 pipeline {
     agent any 
@@ -108,6 +113,46 @@ pipeline {
                }
             }
         }
+
+  <!-- TO STORE ARTICATORY IN JFOG
+
+       stage ('server') {
+    steps {
+        rtServer (
+            id: "Artifactory",
+            url: 'http://localhost:8082/artifactory',
+            username: kalyan',
+            password: 'Kalyan',
+            bypassProxy: true,
+            timeout: 300
+        )
+    }
+}
+
+stage ('upload') {
+    steps {
+        rtUpload (
+            serverId: "Artifactory",
+            spec: '''{
+                "files": [
+                    {
+                        "pattern": "*.war",
+                        "target": "logic-ops-lab-libs-snapshot-local"
+                    }
+                ]
+            }''',
+        )
+    }
+}
+
+stage('publisg build info'){
+    steps {
+        rtPublishBuildInfo (
+            serverId: "Artifactory"
+        )
+    }
+}
+
         
         stage("Docker Build & Tag & Push"){
             steps{
