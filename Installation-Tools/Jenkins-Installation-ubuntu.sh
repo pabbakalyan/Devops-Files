@@ -3,7 +3,6 @@
 --- INSTALL JENKINS ---
 
 sudo apt-get update
-sudo apt install git -y
 sudo apt install openjdk-11-jre -y
 sudo apt-get install maven -y
 
@@ -18,6 +17,21 @@ sudo apt-get install jenkins -y
 sudo systemctl enable jenkins
 sudo systemctl start jenkins
 sudo systemctl status jenkins
+
+By default Jenkins will run on 8080 port 
+if we wantt to change the port in jenkins configuration file 
+
+sudo systemctl stop jenkins
+sudo systemctl status jenkins
+cd /etc/default
+sudo vi jenkins   #chnage port HTTP_PORT=8090 and save and exit
+cd /lib/systemd/system
+sudo vi jenkins.service  #change Environments="Jenkins_port=8090" save and exit
+sudo systemctl daemon-reload
+sudo systemctl restart jenkins
+sudo systemctl status jenkins
+
+now the jenkins server will open in 8090 port
 
 ------------------Official Page-------------------
 
