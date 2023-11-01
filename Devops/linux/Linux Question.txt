@@ -1,0 +1,20 @@
+1. What is Linux?
+2. Who invented Linux? Explain the history of Linux.
+3. What is the difference between Linux and Unix?
+4. What are basic elements or components of Linux?
+5. What is Kernel? Explain its functions.
+6. What are two types of Linux User Mode?
+7. What is Linux Shell? What types of Shells are there in Linux?
+8. What is BASH?
+9. What is LILO?
+10. What is swap space?
+11. What do you mean by a Process States in Linux?
+12. Name different types of modes used in VI editor.
+13. What is the difference between BASH and DOS?
+14. What is CLI and GUI?
+15. Name some Linux variants.
+16. What is a root account?
+17. What is the role of the bootloader in Linux?
+18. What is a process in Linux?
+19. How do you check system performance in Linux?
+20. What is a daemon in Linux?

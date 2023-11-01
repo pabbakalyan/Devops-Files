@@ -1,0 +1,196 @@
+
+Jenkins-ci cd Pipeline for  visual path appalication
+Devops Tools like
+git , jenkins, Tomact , nexus , soanr , docker
+
+
+Create an ubuntu machine with t2.medium 
+sudo -i
+apt-get update -y
+
+############### Installation of git ####################
+sudo apt install git -y
+
+############### Installation of java ###################
+sudo apt-get install  openjdk-11-jre
+
+############### Installation of maven #################
+sudo apt install maven -y
+
+############### Installation of Jenkins ################
+
+sudo apt update
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install jenkins
+
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status 
+
+!!!!!!!!!!!!!!!!!!!!!!! Or Else Another Way to install jenkins !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+jenkins . war file
+wget https://updates.jenkins.io/download/war/2.387.3/jenkins.war
+java -jar jenkins.war --httpPort=8082
+
+
+##################----INSTALL TOMCAT----##################
+
+/opt sudo wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+sudo tar -xvf apache-tomcat-9.0.65.tar.gz
+
+cd /opt/apache-tomcat-9.0.65/conf
+sudo vi tomcat-users.xml
+---add-below-line at the end (2nd-last line)----
+<user username="admin" password="admin1234" roles="admin-gui, manager-gui"/>
+
+
+
+sudo ln -s /opt/apache-tomcat-9.0.65/bin/startup.sh /usr/bin/startTomcat
+sudo ln -s /opt/apache-tomcat-9.0.65/bin/shutdown.sh /usr/bin/stopTomcat
+
+
+
+sudo vi /opt/apache-tomcat-9.0.65/webapps/manager/META-INF/context.xml
+comment:
+  <!-- Valve className="org.apache.catalina.valves.RemoteAddrValve"
+  allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+  
+sudo vi /opt/apache-tomcat-9.0.65/webapps/host-manager/META-INF/context.xml
+comment:
+  <!-- Valve className="org.apache.catalina.valves.RemoteAddrValve"
+  allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+sudo stopTomcat
+sudo startTomcat
+
+after started tomcat go to opt and give one permision
+ chmod -R 757 apache-tomcat-9.0.65
+
+####################### JENKINS PIPELINE ###############
+
+Installing Plugins in jenkins dashboard
+
+1) SonarQube ScannerVersion 2.15 [ code quality check ,code covarage -->bugs,codesmell,vulnerabilities]
+2) jdk Eclipse Temurin installerVersion 1.5
+3)DockerVersion 1.4, Docker PipelineVersion 572.v950f58993843, docker-build-stepVersion 2.9, CloudBees Docker Build and PublishVersion 1.4.0
+4)OWASP Dependency-CheckVersion 5.4.0
+
+Tools:
+1) name: jdk
+   install automatically
+   version: jdk-11.0.19+7
+
+2) SonarQube Scanner
+   Name: sonar-scanner
+   install automatically version latest
+
+3) name: maven
+   install automatically
+   version:3.9.4
+ 
+4) Dependency-check
+   name: DP
+   install automatically
+   version: dependency-check 6.5.1
+ 
+5) name:Docker
+   version:Latest
+
+Pipeline
+
+pipeline {
+    agent any
+    tools
+    {
+        jdk 'jdk'
+        maven 'maven'
+    }
+    
+     environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+               git branch: 'main', changelog: false, credentialsId: '65e4e5e8-935e-4258-892e-5a5fa409c2dc', poll: false, url: 'https://github.com/pabbakalyan/vprofile-project-ci-jenkins.git'
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                sh "mvn clean compile "
+            }
+        }
+        
+         stage('Unit Test') {
+            steps {
+                sh "mvn test "
+            }
+        }
+
+       stage('Build') {
+            steps {
+               sh "mvn clean package"
+            }
+        }
+        
+        stage('OWASP Scan') {
+            steps {
+               dependencyCheck additionalArguments: '--scan ./ ', odcInstallation: 'DP'
+               dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+         
+        stage('Sonarqube') {
+            steps {
+               withSonarQubeEnv('sonar-server'){
+                   sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=vprofile-project-ci-jenkins \
+                   -Dsonar.java.binaries=. \
+                   -Dsonar.projectKey=vprofile-project-ci-jenkins '''
+               }
+           }
+       }
+         
+            stage('Deploy') {
+            steps {
+               sh "sudo cp target/vprofile-v2.war /opt/apache-tomcat-9.0.65/webapps"
+            }
+        } 
+    }
+}
+
+Installation of Docker:
+
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  
+  sudo apt-get update
+  
+  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  
+service docker restart
+sudo usermod -aG docker $USER
+newgrp docker
+sudo chmod 666 /var/run/docker.sock
+sudo systemctl restart docker
+
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community

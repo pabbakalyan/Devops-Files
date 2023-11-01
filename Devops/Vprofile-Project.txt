@@ -1,0 +1,120 @@
+cd /opt
+sudo yum install git -y
+
+
+Installation Maven
+
+sudo yum install java -y
+wget https://dlcdn.apache.org/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.zip
+unzip apache-maven-3.9.4-bin.zip 
+mv apache-maven-3.9.4 maven
+sudo yum install maven -y
+
+cd /etc/profile.d
+vim profile.d
+export M2_HOME=/opt/maven
+export PATH=${M2_HOME}/bin:${PATH}
+source maven.sh
+
+Installation Jenkins 
+
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+sudo yum install jenkins -y
+
+systemctl enable jenkins
+systemctl start jenkins
+
+Installing Plugins in jenkins dashboard
+
+1) SonarQube ScannerVersion 2.15 [ code quality check tool ] its is a server
+2) jdk Eclipse Temurin installerVersion 1.5
+3)DockerVersion 1.4, Docker PipelineVersion 572.v950f58993843, docker-build-stepVersion 2.9, CloudBees Docker Build and PublishVersion 1.4.0
+4)OWASP Dependency-CheckVersion 5.4.0 [ security analysis ]
+
+Tools:
+1) name: jdk
+   install automatically
+   version: jdk-11.0.19+7
+
+2) SonarQube Scanner
+   Name: sonar-scanner
+   install automatically version latest
+
+3) name: maven
+   install automatically
+   version:3.9.4
+ 
+4) Dependency-check
+   name: DP
+   install automatically
+   version: dependency-check 6.5.1
+ 
+5) name:Docker
+   version:Latest
+
+Pipeline:
+
+pipeline {
+    agent any
+    tools
+    {
+        jdk 'jdk'
+        maven 'maven'
+    }
+    
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+               git branch: 'main', changelog: false, credentialsId: '11085d18-656d-4f2a-9a78-6541db06f2fc', poll: false, url: 'https://github.com/pabbakalyan/vprofile-project-ci-jenkins.git'
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+        
+         stage('Unit Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        
+        stage('OWASP Scan') {
+            steps {
+               dependencyCheck additionalArguments: '--scan ./ ', odcInstallation: 'DP'
+               dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        
+        stage('Sonarqube') {
+            steps {
+               withSonarQubeEnv('sonar-server'){
+                   sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=vprofile-project-ci-jenkins \
+                   -Dsonar.java.binaries=. \
+                   -Dsonar.projectKey=vprofile-project-ci-jenkins '''
+               }
+            }
+        }
+    }
+}
+
+
+
+Installation Docker
+
+sudo yum install docker -y
+sudo yum install npm -y
+
+systemctl enable docker
+systemctl start docker
+
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
