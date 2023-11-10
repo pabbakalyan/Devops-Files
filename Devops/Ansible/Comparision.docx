@@ -1,0 +1,37 @@
+Difference Between ANSIBLE & Terraform
+  
+  Ansible:
+let's take an example let's say you have joined an organization and there are 100 virtual machines in that organization 50 of them are Windows Virtual Machine
+50 of them are Linux virtual machines and in Linux you have combination of virtual machines some of them are Debian & some of them are Centos some of them are rhel some of them are Alpine
+so if you write a script you have to make sure that it works on Windows it works on Linux and in Linux it works on different distributions 
+so that's the problem right if you have to write script for Windows it has to be Powershell scripting and for Linux if you have variety of distributions the package
+manager keeps changing in each of the distribution so either you need to use Curl commands or you need to use some if condition and to identify the
+distribution and change the package manager and to add that you need to manage passwordless authentication between the servers in your scripting so
+
+what ansible said is
+don't worry about all of these things just tell me what is the DNS or IP address of all of your virtual machines
+just establish a passwordless authentication for one single time and what I will do is write a playbook for me and irrespective of the virtual
+machine type operating system type and distribution type I will create resources or I will trade the configuration on all of those virtual machines if you want me to create some
+package I can do that if you want me to upgrade version of a package I can do that if you want to install any security updates I can do that
+so that is what ansible does ansible solves problem of managing configuration in hundreds of servers you don't have to bother about it once you configure ansible and write the Playbook 
+
+what Terraform said is
+terraform solves a different problem which is related to infrastructure for example you have AWS Azure and openstack in your organization
+let's say you have to create 10 virtual machines on all of them 
+Ican simply do that for AWS I'll use cloud formation templates 
+for Azure I'll use Azure resource manager
+for openstack I'll use openstack heat templates
+and I'll create these virtual machines now not just virtual machines I'll tell you to create VPC configuration and integrate it with storage so again you
+will say okay that's still fine I'll go to AWS and I'll update my cloud formation template
+I'll update my Azure resource manager and openstack templates 
+now the problem is as a devops engineer or as someone joining your organization they need to learn about three different things or in one organization you
+learned AWS cloud formation templates in another organization if they are using resource manager Azure resource manager you need to learn that in another
+organization if they are using openstack heat templates you have to learn that so to solve this problem what terraform
+said is don't worry about all of these things I can automate infrastructure or I can create resources on any of the cloud providers it can be public Cloud
+private cloud and to that matter of fact I can also create on any SAS provider if I get to interact with the apis of that
+provider if the provider has apis terraform will connect to that provider apis and terraform will create resources on that
+provider so if AWS has an apis what terraform will do is terraform will configure AWS as a provider it will interact with the apis of AWS and it will create resources
+on AWS when I say it will create the developers of terraform what they have done they have created providers and when you write the provider name in the terraform script or 
+template terraform will understand that okay I need to talk to AWS for whatever Things are Written inside the terraform templates the hashic or terraform templates right 
+so this way terraform solves the problem of devops Engineers or organizations switching from one provider to the other provider they just
+need to learn terraform because it works on the concept of infrastructure as code or the another concept called API as code 
