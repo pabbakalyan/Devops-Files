@@ -1,0 +1,11 @@
+1) explain the ci/cd workflow ?
+
+2) how do you handle issue in worker node ?
+let's say uh you know you have your Jenkins jobs that are running on your worker notes so how do you handle these things uh your worker note is going down or your worker node is not 
+responsive
+so what you will say is that you know I'll log into this worker node try to understand the problem uh I'll try to uh get the thread terms or you know I'll try to look into the worker
+nodes Health okay uh you can say that I wrote a simple uh python application where it will always monitor the worker node's health and in case the CPU or Ram is going out of limit 
+okay for some reason the CPU or the ram is full it will send me uh alerts when the CPU reached 80 or when the ram reached 80 percent so that we take immediate action or you can say we 
+implemented Auto scaling on the ec2 instances 
+
+3) jenkns administration related questions ?
