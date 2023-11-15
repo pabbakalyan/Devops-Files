@@ -9,3 +9,7 @@ okay for some reason the CPU or the ram is full it will send me uh alerts when t
 implemented Auto scaling on the ec2 instances 
 
 3) jenkns administration related questions ?
+
+4)explain ci cd process?
+we have a git repository where we have an application source code,as soon as a developer raises a pull request to this git repository, we have configured webhooks, using the webhook we trigger the jenkins pipeline
+we have used declarative jenkins pipeline
