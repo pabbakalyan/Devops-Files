@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app-deployment
+spec:
+  replicas: 3  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: react-app
+  template:
+    metadata:
+      labels:
+        app: react-app
+    spec:
+      containers:
+        - name: react-app-container
+          image: sevenajay/2048:latest  # Use your actual Docker image name and tag
+          ports:
+            - containerPort: 3000  # The port your React app is listening on
+
+
+apiVersion: Specifies the API version that this YAML is using. In this case, it's using the apps/v1 API version,
+which is common for Deployments.
+
+kind: Specifies the type of Kubernetes resource, which is a Deployment in this case.
+
+metadata: Contains metadata about the Deployment, including its name.
+
+spec: Describes the desired state for the Deployment.
+
+replicas: Specifies the number of pod replicas to create. In this example, it's set to 3.
+
+selector: Defines how the Deployment finds which pods to manage. It uses labels.
+
+matchLabels: Specifies that it should manage pods with the label app: react-app.
+template: Describes the pods that will be created.
+
+metadata: Contains labels for the pods.
+
+labels: Specifies that the pods should have the label app: react-app.
+spec: Specifies the pod's specification.
+
+containers: Describes the containers within the pod.
+
+name: Specifies the name of the container, which is react-app-container.
+
+image: Specifies the Docker image to use for the container. In this case, it's sevenajay/2048:latest.
+
+ports: Specifies the ports that the container exposes.
+
+containerPort: Specifies the port (3000) on which the React app inside the container is listening.
+
+
+
+In Kubernetes, a replica refers to the number of identical copies (or instances) of a pod that are running concurrently. Replicas are defined within a Kubernetes resource called a Deployment. The purpose of having multiple replicas is to ensure high availability, fault tolerance, and load distribution for the application.
+
+Here's how it works:
+
+High Availability: If one of the pod instances fails for any reason (such as a node failure or a container crash), 
+the remaining replicas can continue serving the application. Kubernetes will automatically replace the failed pod with a new
+one to maintain the desired number of replicas.
+
+Load Distribution: With multiple replicas, incoming traffic can be distributed among the instances. This helps in spreading the 
+load and prevents a single instance from becoming a bottleneck. Load balancing is crucial for maintaining the overall health and 
+performance of the application.
+
+Rolling Updates and Rollbacks: When updating the application (e.g., deploying a new version), Kubernetes can perform rolling updates by 
+gradually replacing old replicas with new ones. This ensures that the application remains available during the update process. 
+If an issue is detected after an update, Kubernetes allows for easy rollback to a previous version.
