@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-app-service
+spec:
+  selector:
+    app: react-app
+  ports:
+    - protocol: TCP
+      port: 80  # The port exposed by the service within the cluster
+      targetPort: 3000  # The port your React app is listening on inside the pod
+  type: LoadBalancer
+
+apiVersion: Specifies the API version for the Service, which is v1.
+
+kind: Specifies the type of Kubernetes resource, which is a Service in this case.
+
+metadata: Contains metadata about the Service, including its name.
+
+spec: Describes the desired state for the Service.
+
+selector: Specifies the pods that the service will route traffic to.
+
+app: react-app: Selects pods with the label app: react-app.
+ports: Specifies the ports that the service should expose.
+
+protocol: Specifies the protocol (TCP).
+
+port: Specifies the port (80) on which the service will be accessible within the cluster.
+
+targetPort: Specifies the port (3000) on which the pods (with the app: react-app label) are listening.
+
+type: Specifies the type of service, which is a LoadBalancer. This makes the service accessible from outside the cluster.
+The actual behavior might depend on the Kubernetes cluster environment.
+
+In summary, these YAML files define a Deployment for running three replicas of a React app in containers and a Service to expose
+that app outside the cluster using a LoadBalancer. The app's Docker image is specified, and communication between the 
+Service and the pods is set up through ports.
