@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', changelog: false, credentialsId: '15fb69c3-3460-4d51-bd07-2b0545fa5151', poll: false, url: 'https://github.com/jaiswaladi246/Shopping-Cart.git'
+                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/pabbakalyan/Shopping-Cart.git'
             }
         }
         
@@ -51,13 +51,28 @@ pipeline {
                     withDockerRegistry(credentialsId: '2fe19d8a-3d12-4b82-ba20-9d22e6bf1672', toolName: 'docker') {
                         
                         sh "docker build -t shopping-cart -f docker/Dockerfile ."
-                        sh "docker tag  shopping-cart adijaiswal/shopping-cart:latest"
-                        sh "docker push adijaiswal/shopping-cart:latest"
+                        sh "docker tag  shopping-cart pabbakalyan/shopping-cart:latest"
+                        sh "docker push pabbakalyan/shopping-cart:latest"
                     }
                 }
             }
         }
-        
+
+        stage("Trigger CD Pipeline"){
+            steps{
+                build job: "CD_Pipeline" , wait: true
+            }
+        }
+
+        stage("Docker Deploy"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker run -itd --name pet -p 8070:8070  pabbakalyan/pet-clinic123:latest "
+                    }
+                }
+            }
+        }
         
     }
 }
