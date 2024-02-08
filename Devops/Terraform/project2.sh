@@ -134,3 +134,8 @@ resource "aws_security_group" "my_sg" {
 
 }
 
+
+Access key ID	Secret access key
+AKIAZUPNF4FRS2LWG4RU	FXTI7COuBg6ZjQ4c52qx5G+AlEO+WEFw55fyF+OX
+
+
