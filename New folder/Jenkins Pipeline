@@ -1,0 +1,147 @@
+Installing Plugins in jenkins dashboard
+
+1) SonarQube ScannerVersion 2.15 [ code quality check tool ] its is a server
+2) jdk Eclipse Temurin installerVersion 1.5
+3)DockerVersion 1.4, Docker PipelineVersion 572.v950f58993843, docker-build-stepVersion 2.9, CloudBees Docker Build and PublishVersion 1.4.0
+4)OWASP Dependency-CheckVersion 5.4.0 [ security analysis ]
+
+Tools:
+1) name: jdk
+   install automatically
+   version: jdk-11.0.19+7 or jdk-17
+
+2) SonarQube Scanner
+   Name: sonar-scanner
+   install automatically version latest
+
+3) name: maven
+   install automatically
+   version:3.9.4 or 3.6.0
+ 
+4) Dependency-check
+   name: DP
+   install automatically
+   version: dependency-check 6.5.1
+ 
+5) name:Docker
+  version:Latest
+
+6) config file provider
+
+7) pipeline maven integration
+
+pipeline {
+    agent any 
+    
+    tools{
+        jdk 'jdk'
+        maven 'maven'
+    }
+    
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+    
+    stages{
+        
+        stage("Git Checkout"){
+            steps{
+                git branch: 'main', changelog: false, credentialsId: '8623ccbd-43bf-411e-a99d-ec5d7343a21a', poll: false, url: 'https://github.com/pabbakalyan/vprofile-project-ci-jenkins.git'
+            }
+        }
+        
+        stage("Compile"){
+            steps{
+                sh "mvn clean compile"
+            }
+        }
+        
+         stage("Test Cases"){
+            steps{
+                sh "mvn test"
+            }
+        }
+        
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=vprofile-project-ci-jenkins \
+                   -Dsonar.java.binaries=. \
+                   -Dsonar.projectKey=vprofile-project-ci-jenkins '''
+    
+                }
+            }
+        }
+
+       stage("quality gate"){
+            steps {
+                script {
+                  waitForQualityGate abortPipeline: false, credentialsId: 'sonar' 
+                }
+           }
+        }
+
+        
+        stage("OWASP Dependency Check"){
+            steps{
+                dependencyCheck additionalArguments: '--scan ./ ', odcInstallation: 'DP'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
+      stage("Trivy FS Scan"){
+            steps{
+                sh "trivy fs ."
+            }
+        }
+        
+         stage("Build"){
+            steps{
+                sh " mvn clean install"
+            }
+        }
+
+        stage("Deploy to Nexus"){
+            steps{
+                withMaven(globalMavenSettingsConfig: 'global-settings-xml'){
+                sh " mvn delpoy"
+               }
+            }
+        }
+        
+        stage("Docker Build & Tag & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        
+                        sh "docker build -t image1 ."
+                        sh "docker tag image1 pabbakalyan/pet-clinic123:latest "
+                        sh "docker push pabbakalyan/pet-clinic123:latest "
+                    }
+                }
+            }
+        }
+        
+        stage("TRIVY"){
+            steps{
+                sh " trivy image pabbakalyan/pet-clinic123:latest"
+            }
+        }
+        
+        stage("Deploy To Tomcat"){
+            steps{
+                sh "cp  /var/lib/jenkins/workspace/CI-CD/target/petclinic.war /opt/apache-tomcat-9.0.65/webapps/ "
+            }
+        }
+
+        stage("Docker Deploy"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker run -itd --name pet -p 8070:8070  pabbakalyan/pet-clinic123:latest "
+                    }
+                }
+            }
+        }
+    }
+}

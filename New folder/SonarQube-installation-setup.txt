@@ -1,0 +1,97 @@
+installation and configure of SONARQUBE server
+++++++++++++++++++++++++++++++++++++++
+1. EC2- t2.medium-   ubuntu-22   -connect
+2. update the server
+   #sudo -i
+   #apt-get update -y
+
+3. Install java,wget,unzip
+   #java --version
+   #apt install openjdk-11-jre-headless -y
+
+3.1 Install wget and unzip
+   #apt install wget -y
+   # sudo apt install  unzip -y
+
+4. now change the dir
+   #cd /opt/
+5.search in browser 
+    https://binaries.sonarsource.com/
+    click on Distributions -->sonarqube ----> sonarqube-9.zip  --> copy link address
+
+6. download the sonarqube zip file into server
+   #sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.0.0.45539.zip
+
+7. unzip sonar
+   # sudo unzip sonarqube-9.0.0.45539.zip
+
+8. adduser sonar
+   # sudo adduser sonar
+   give passwrd : sonar
+   retype: sonar
+
+9. Give normal user acess
+   #visudo
+        root    ALL=(ALL)         ALL= ALL
+        sonar ALL=(ALL)        NOPASSWD: ALL
+		for save and quit -->ctrl+x y enter
+
+10. give permission as a normal user
+    # sudo chown -R sonar:sonar /opt/sonarqube-9.0.0.45539/
+    # sudo chmod -R 775 /opt/sonarqube-9.0.0.45539/
+
+11. goto inside the sonar dir
+    #cd sonarqube-9.0.0.45539/
+    #cd bin/linux-x86-64/
+    sh sonar.sh start
+
+12. switch to the sonar user
+    # su sonar
+    $ sh sonar.sh start
+    If it  SonarQube is not running
+  
+13.Delete the Temp Directory
+       $ cd ../../
+       $ sudo rm -rf temp/
+	Now start again sonar
+	$cd bin/linux-x86-64/
+	$sh sonar.sh start
+	$$sh sonar.sh status
+	
+	now public ip of sonarserver with portnumber 9000
+	        13.113.198.55:9000/
+			now enter the default username and pasword is -->admin admin
+			now restet ur username passwrd -->admin1
+14.goto jenkins -server-configure the --
+ setting.xml 
+
+give sonar credentail 
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+	how to integrate with jenkins
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
+			
+15.  After you will give the sonarqubeURL and username and passwrd in pom.xml
+     under pom.xml inside properties give it
+	 // <properties>
+  <!-- Other properties -->
+  <sonar.host.url>http://13.113.198.55:9000/</sonar.host.url>
+    <sonar.login>admin</sonar.login>
+    <sonar.password>admin1</sonar.password>
+     <sonar.java.binaries>src/</sonar.java.binaries>
+</properties> //
++++++++++++++++++++++++++++++++++++++++++++++++++
+16. how to configure the sonar credentials in the jenkins -server=====
+=========================================================================
+connect jenkins server inside 
+goto this dir
+     #/usr/share/maven/conf
+	 #vi setting.xml
+	 inside the servers dependency
+ <server>
+      <id>sonar</id>
+      <username>admin</username>
+      <password>admin1</password>
+    </server>
+	++++++++++++++++++++++++++++++++++
+[ or else we can directly ]
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
